@@ -1,0 +1,95 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# PLANTILLA robots.txt — acceso de buscadores y motores de IA
+#
+# ⚠️ VERIFICA LOS NOMBRES ANTES DE DESPLEGAR.
+# Una regla solo funciona si el User-agent está escrito EXACTAMENTE como el
+# rastreador se anuncia. "GPT-Bot" en vez de "GPTBot" falla en silencio.
+# Los proveedores cambian y añaden bots; consulta la documentación oficial de
+# cada uno (OpenAI, Anthropic, Google, Perplexity, Common Crawl) antes de
+# publicar este archivo. La lista de abajo es un punto de partida, no una
+# verdad permanente.
+#
+# ⚠️ Y LO MÁS IMPORTANTE: robots.txt controla el RASTREO, no la CITA.
+# Permitir a todos los bots no hace que te citen. Bloquearlos sí garantiza que
+# no puedan hacerlo. Es condición necesaria, nunca suficiente.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# --- Buscadores tradicionales -----------------------------------------------
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# --- Bots de búsqueda / citación en IA --------------------------------------
+# Estos son los que traen citas y enlaces. Para una marca que quiere ser
+# recomendada, se permiten SIEMPRE.
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+# --- Bots de entrenamiento --------------------------------------------------
+# DECISIÓN DEL CLIENTE, no default nuestro. Permitirlos puede ayudar a que la
+# marca quede en el conocimiento del modelo; bloquearlos protege el contenido de
+# ser usado para entrenar. Se pregunta, se decide, y se deja por escrito quién
+# lo decidió. Para una marca pequeña que quiere notoriedad, permitir suele ser
+# lo correcto.
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+# CCBot (Common Crawl) alimenta a muchísimos modelos de terceros.
+User-agent: CCBot
+Allow: /
+
+# --- Resto ------------------------------------------------------------------
+User-agent: *
+Allow: /
+Disallow: /carrito
+Disallow: /checkout
+Disallow: /cuenta
+Disallow: /buscar
+
+Sitemap: https://EJEMPLO.com/sitemap.xml
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NOTA sobre DeepSeek y otros modelos:
+# No me consta que DeepSeek publique un user-agent de rastreo documentado.
+# Muchos modelos no rastrean la web ellos mismos: consumen Common Crawl o un
+# índice de búsqueda de terceros. Por eso CCBot y los buscadores tradicionales
+# importan más de lo que parece. No inventes reglas para bots que no existen:
+# ensucian el archivo y dan falsa sensación de cobertura.
+# ─────────────────────────────────────────────────────────────────────────────
