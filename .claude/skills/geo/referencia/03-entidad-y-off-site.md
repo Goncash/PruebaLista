@@ -160,3 +160,10 @@ Checklist por cliente con estado y responsable:
 
 **Marca explícito lo que depende del cliente.** Si no lo hace, el plan no avanza y
 hay que poder demostrar de qué lado se detuvo.
+
+> **Cuando el cliente sí coopera** (caso OHRE, confirmado 2026-09-09), esta capa
+> deja de ser el cuello de botella y pasa a ser la ventaja: la mayoría de sus
+> competidores no la va a trabajar porque exige constancia del dueño del negocio,
+> no presupuesto. Aprovecha la cooperación pidiendo **poco y periódico** —una
+> rutina de reseñas semanal pesa más que una campaña de un mes— y dale al cliente
+> una lista corta con fechas, no un documento de veinte puntos.

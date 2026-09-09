@@ -71,6 +71,14 @@ Antes de invertir, tres preguntas que hay que responder con datos:
 3. **¿Hay dónde publicar?** Si no hay sitio, la capa 3 no existe todavía
    (ver `06-plataformas.md`).
 
+> **Estado de T1SR (confirmado 2026-09-09): tiene sitio, sin blog.**
+> Hay dónde montar la capa 3, así que la decisión no es "si", es "qué primero".
+> Recomendación: **biblioteca de transcripciones antes que blog.** El contenido ya
+> está producido, cada video es una consulta ya respondida, y llena el corpus sin
+> pedirle a nadie que escriba de cero. El blog editorial viene después, y solo
+> para las consultas que el video no cubre bien (comparativas, listas, guías de
+> referencia que se actualizan).
+
 Estrategia realista para este perfil:
 - **Transcripciones como corpus.** Cada video ya es contenido; publicarlo como texto
   estructurado (con la pregunta como título) lo convierte en material citable sin

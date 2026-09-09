@@ -163,13 +163,15 @@ El sistema es el mismo; las palancas cambian de peso. Ver `referencia/07-nichos.
 |---|---|---|
 | Servicio local | Perfil de negocio + reseñas + directorios locales | OHRE (inmobiliaria, León) |
 | Ecommerce / producto | Schema de producto + reseñas + comparativas de terceros | Hominess (aromatizantes) |
-| Creador / medio de nicho | Comunidad (Reddit, foros, YouTube) + bases de datos del nicho | Turno 1 Sol Ring (MTG) |
+| Creador / medio de nicho | Comunidad (foros, YouTube) + bases de datos del nicho | Turno 1 Sol Ring (MTG) |
 | B2B / servicios pro | Directorios de categoría + casos + prensa sectorial | — |
 
-**Para un creador sin sitio propio, la capa 3 no es un blog: son las
-transcripciones y las páginas de referencia del canal.** Antes de montar la
-maquinaria completa, verifica que exista demanda de consulta en ese idioma y ese
-nicho — puede no compensar.
+**Para un creador, la capa 3 no empieza por un blog: empieza por las
+transcripciones y las páginas de referencia del canal.** El contenido ya está
+producido; publicarlo como texto estructurado llena el corpus sin escribir de
+cero. Antes de montar la maquinaria completa, verifica que exista demanda de
+consulta en ese idioma y ese nicho — ganar una consulta que nadie hace es una
+victoria vacía.
 
 ---
 
