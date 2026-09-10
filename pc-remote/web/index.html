@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1116">
+<title>Mi PC</title>
+<link rel="manifest" href="/app.webmanifest">
+<link rel="icon" href="/icono.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icono.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  :root {
+    --fondo: #0e1116;
+    --tarjeta: #171c24;
+    --borde: #262d38;
+    --texto: #e7ecf3;
+    --tenue: #8b97a8;
+    --verde: #35c26a;
+    --rojo: #e4574f;
+    --ambar: #e0a33c;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--fondo);
+    color: var(--texto);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+    text-align: center;
+  }
+  .punto {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--tenue); display: inline-block; vertical-align: middle;
+    margin-right: 8px;
+  }
+  .punto.on  { background: var(--verde); box-shadow: 0 0 0 6px rgba(53,194,106,.15); }
+  .punto.off { background: var(--rojo);  box-shadow: 0 0 0 6px rgba(228,87,79,.15); }
+  .punto.espera { animation: latido 1.2s ease-in-out infinite; }
+  @keyframes latido { 50% { opacity: .3; } }
+
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 600; letter-spacing: -.01em; }
+  .estado { font-size: 17px; font-weight: 600; margin: 0 0 6px; }
+  .detalle { color: var(--tenue); font-size: 13px; margin: 0; min-height: 20px; }
+
+  .tarjeta {
+    width: 100%; max-width: 340px;
+    background: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 18px;
+    padding: 22px 20px;
+    margin-bottom: 28px;
+  }
+
+  .boton {
+    position: relative; overflow: hidden;
+    width: 190px; height: 190px; border-radius: 50%;
+    border: 1px solid var(--borde);
+    background: var(--tarjeta);
+    color: var(--texto);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; cursor: pointer; user-select: none;
+    transition: transform .12s ease, opacity .2s ease;
+    touch-action: manipulation;
+  }
+  .boton:active { transform: scale(.97); }
+  .boton[disabled] { opacity: .35; cursor: default; }
+  .boton svg { width: 46px; height: 46px; stroke: var(--rojo); z-index: 1; }
+  .boton span { font-size: 13px; color: var(--tenue); z-index: 1; letter-spacing: .02em; }
+  /* La barra se llena mientras se mantiene pulsado */
+  .relleno {
+    position: absolute; inset: 0;
+    background: rgba(228,87,79,.22);
+    transform: scaleY(0); transform-origin: bottom;
+    transition: transform .05s linear;
+  }
+
+  .cancelar {
+    margin-top: 26px; padding: 14px 30px;
+    background: transparent; color: var(--texto);
+    border: 1px solid var(--borde); border-radius: 999px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  .cuenta { font-size: 42px; font-weight: 700; color: var(--ambar); margin: 0 0 2px; }
+  .oculto { display: none !important; }
+  .pie { margin-top: 32px; color: var(--tenue); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="tarjeta">
+  <h1 id="nombre">Mi PC</h1>
+  <p class="estado"><span id="punto" class="punto espera"></span><span id="texto">Consultando…</span></p>
+  <p class="detalle" id="detalle"></p>
+</div>
+
+<!-- Vista normal: boton de apagado -->
+<div id="vista-apagar">
+  <button class="boton" id="boton" disabled>
+    <div class="relleno" id="relleno"></div>
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+      <path d="M12 3v9"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/>
+    </svg>
+    <span id="etiqueta">mantén pulsado</span>
+  </button>
+</div>
+
+<!-- Vista de cuenta regresiva -->
+<div id="vista-cuenta" class="oculto">
+  <p class="cuenta" id="segundos">–</p>
+  <p class="detalle">apagando la PC…</p>
+  <button class="cancelar" id="cancelar">Cancelar</button>
+</div>
+
+<p class="pie" id="pie"></p>
+
+<script>
+(function () {
+  "use strict";
+
+  // El token llega en la URL (?t=...). Lo guardamos para que el acceso directo
+  // del celular siga funcionando aunque se pierda la query.
+  var token = new URLSearchParams(location.search).get("t");
+  try {
+    if (token) localStorage.setItem("pcremote_token", token);
+    else token = localStorage.getItem("pcremote_token");
+  } catch (e) { /* modo privado: seguimos con el token de la URL */ }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var MANTENER_MS = 1200;   // cuanto hay que mantener pulsado
+  var TIMEOUT_MS = 4000;    // si no responde en 4s, la damos por apagada
+
+  var apagando = false;
+
+  function pedir(ruta, metodo) {
+    var ctrl = new AbortController();
+    var t = setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS);
+    return fetch(ruta + "?t=" + encodeURIComponent(token || ""), {
+      method: metodo || "GET",
+      cache: "no-store",
+      signal: ctrl.signal
+    }).then(function (r) {
+      clearTimeout(t);
+      if (r.status === 401) throw new Error("token");
+      if (!r.ok) throw new Error("http");
+      return r.json();
+    }, function (e) { clearTimeout(t); throw e; });
+  }
+
+  function formatearTiempo(seg) {
+    if (seg == null) return "";
+    var h = Math.floor(seg / 3600), m = Math.floor((seg % 3600) / 60);
+    if (h >= 24) return "encendida hace " + Math.floor(h / 24) + " d " + (h % 24) + " h";
+    if (h > 0) return "encendida hace " + h + " h " + m + " min";
+    return "encendida hace " + m + " min";
+  }
+
+  function mostrarEncendida(d) {
+    $("punto").className = "punto on";
+    $("texto").textContent = "Encendida";
+    $("nombre").textContent = d.nombre || "Mi PC";
+    $("detalle").textContent = formatearTiempo(d.encendida_desde) || (d.sistema || "");
+    $("boton").disabled = false;
+
+    if (d.apagando) {
+      apagando = true;
+      $("vista-apagar").classList.add("oculto");
+      $("vista-cuenta").classList.remove("oculto");
+      $("segundos").textContent = d.faltan_segundos;
+    } else {
+      apagando = false;
+      $("vista-cuenta").classList.add("oculto");
+      $("vista-apagar").classList.remove("oculto");
+      $("etiqueta").textContent = "mantén pulsado";
+    }
+  }
+
+  function mostrarApagada() {
+    apagando = false;
+    $("punto").className = "punto off";
+    $("texto").textContent = "Apagada";
+    $("detalle").textContent = "sin respuesta en la red";
+    $("boton").disabled = true;
+    $("vista-cuenta").classList.add("oculto");
+    $("vista-apagar").classList.remove("oculto");
+  }
+
+  function mostrarError(msg) {
+    $("punto").className = "punto";
+    $("texto").textContent = "Sin acceso";
+    $("detalle").textContent = msg;
+    $("boton").disabled = true;
+  }
+
+  function consultar() {
+    if (!token) { mostrarError("falta el token: vuelve a abrir el enlace del agente"); return; }
+    pedir("/api/estado").then(mostrarEncendida, function (e) {
+      if (e.message === "token") mostrarError("token invalido: abre de nuevo el enlace del agente");
+      else mostrarApagada();
+    });
+  }
+
+  // --- mantener pulsado para apagar ---
+  var inicio = null, raf = null;
+
+  function pintar() {
+    var avance = Math.min(1, (Date.now() - inicio) / MANTENER_MS);
+    $("relleno").style.transform = "scaleY(" + avance + ")";
+    if (avance >= 1) { soltar(true); return; }
+    raf = requestAnimationFrame(pintar);
+  }
+
+  function pulsar(ev) {
+    if ($("boton").disabled || apagando || inicio !== null) return;
+    ev.preventDefault();
+    inicio = Date.now();
+    $("etiqueta").textContent = "sigue pulsando…";
+    raf = requestAnimationFrame(pintar);
+  }
+
+  function soltar(completado) {
+    if (inicio === null) return;
+    inicio = null;
+    cancelAnimationFrame(raf);
+    $("relleno").style.transform = "scaleY(0)";
+    $("etiqueta").textContent = "mantén pulsado";
+    if (completado) apagar();
+  }
+
+  function apagar() {
+    if (navigator.vibrate) navigator.vibrate(40);
+    $("boton").disabled = true;
+    pedir("/api/apagar", "POST").then(mostrarEncendida, function () { mostrarApagada(); });
+  }
+
+  var boton = $("boton");
+  boton.addEventListener("pointerdown", pulsar);
+  boton.addEventListener("pointerup", function () { soltar(false); });
+  boton.addEventListener("pointercancel", function () { soltar(false); });
+  boton.addEventListener("pointerleave", function () { soltar(false); });
+  boton.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+
+  $("cancelar").addEventListener("click", function () {
+    pedir("/api/cancelar", "POST").then(mostrarEncendida, function () { mostrarApagada(); });
+  });
+
+  // Durante la cuenta regresiva consultamos cada segundo; el resto, cada 3.
+  consultar();
+  setInterval(function () { if (apagando) consultar(); }, 1000);
+  setInterval(function () { if (!apagando) consultar(); }, 3000);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) consultar();
+  });
+
+  $("pie").textContent = "solo funciona en la misma red que la PC";
+})();
+</script>
+</body>
+</html>
