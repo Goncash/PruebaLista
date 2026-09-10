@@ -15,6 +15,7 @@ Uso:
 """
 
 import argparse
+import base64
 import ctypes
 import hmac
 import json
@@ -32,6 +33,23 @@ from urllib.parse import urlparse, parse_qs
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WEB_DIR = os.path.join(BASE_DIR, "web")
 CONFIG_PATH = os.path.join(BASE_DIR, "config.json")
+
+# La version "todo en uno" lleva aqui la web incrustada en base64. En el repo
+# esta vacio y los archivos se leen de la carpeta web/.
+# (lo rellena construir_archivo_unico.py)
+EMBEBIDOS = {}
+
+
+def leer_recurso(nombre):
+    """Contenido de un archivo de la web: primero del disco, si no, incrustado."""
+    ruta = os.path.join(WEB_DIR, nombre)
+    if os.path.exists(ruta):
+        with open(ruta, "rb") as f:
+            return f.read()
+    if nombre in EMBEBIDOS:
+        return base64.b64decode(EMBEBIDOS[nombre])
+    return None
+
 
 SISTEMA = platform.system()  # 'Windows', 'Linux', 'Darwin'
 ARRANQUE = time.time()
@@ -156,11 +174,8 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(cuerpo)
 
     def responder_archivo(self, nombre, tipo):
-        ruta = os.path.join(WEB_DIR, nombre)
-        try:
-            with open(ruta, "rb") as f:
-                cuerpo = f.read()
-        except OSError:
+        cuerpo = leer_recurso(nombre)
+        if cuerpo is None:
             self.send_error(404, "no encontrado")
             return
         self.send_response(200)

@@ -11,6 +11,10 @@ Son dos piezas:
 - **La interfaz web**: la sirve el propio agente. La abres en el navegador del celular
   y la agregas a la pantalla de inicio; se ve y se usa como una app.
 
+Para instalar sin complicaciones existe `pc-remote-todo-en-uno.py`: el agente con la
+web ya incrustada dentro, un archivo suelto que se descarga y se ejecuta. Se genera
+con `python3 construir_archivo_unico.py` cada vez que cambia algo de `web/`.
+
 ---
 
 ## Antes de empezar: lo que esto NO puede hacer
@@ -29,7 +33,26 @@ Vale la pena ser claro para que no te lleves una sorpresa:
 
 ---
 
-## Instalación
+## Instalación rápida (un solo archivo)
+
+Todo esto se hace **en la PC**, no en el celular.
+
+1. Instala Python si no lo tienes: [python.org/downloads](https://www.python.org/downloads/).
+   En Windows, **marca "Add Python to PATH"** en la primera pantalla del instalador.
+2. Descarga `pc-remote-todo-en-uno.py` (botón *Download raw file* en GitHub) y déjalo
+   en el Escritorio. Ese archivo lleva la web incrustada: no necesita nada más al lado.
+3. Doble clic. Si Windows pregunta por el firewall, dale **Permitir en redes privadas**.
+4. Se abre una ventana con un enlace tipo `http://192.168.1.45:8765/?t=aB3xK9pQr2Lm`.
+   Ábrelo en el celular (mismo WiFi) y agrégalo a la pantalla de inicio.
+
+Deja esa ventana abierta: si la cierras, el agente se detiene.
+
+El resto de este documento explica la versión en carpeta, cómo hacer que arranque
+solo con la PC, y qué hacer si algo falla.
+
+---
+
+## Instalación completa (carpeta del repo)
 
 ### 1. Python en la PC
 
