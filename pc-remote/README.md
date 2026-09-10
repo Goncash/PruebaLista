@@ -35,20 +35,50 @@ Vale la pena ser claro para que no te lleves una sorpresa:
 
 ## Instalación rápida (un solo archivo)
 
-Todo esto se hace **en la PC**, no en el celular.
+Todo esto se hace **en la PC**, no en el celular. Dos pasos.
 
 1. Instala Python si no lo tienes: [python.org/downloads](https://www.python.org/downloads/).
    En Windows, **marca "Add Python to PATH"** en la primera pantalla del instalador.
-2. Descarga `pc-remote-todo-en-uno.py` (botón *Download raw file* en GitHub) y déjalo
-   en el Escritorio. Ese archivo lleva la web incrustada: no necesita nada más al lado.
-3. Doble clic. Si Windows pregunta por el firewall, dale **Permitir en redes privadas**.
-4. Se abre una ventana con un enlace tipo `http://192.168.1.45:8765/?t=aB3xK9pQr2Lm`.
-   Ábrelo en el celular (mismo WiFi) y agrégalo a la pantalla de inicio.
+2. Descarga `pc-remote-todo-en-uno.py` (botón *Download raw file* en GitHub) y dale
+   doble clic.
 
-Deja esa ventana abierta: si la cierras, el agente se detiene.
+En Windows, ese primer doble clic deja todo configurado solo:
 
-El resto de este documento explica la versión en carpeta, cómo hacer que arranque
-solo con la PC, y qué hacer si algo falla.
+- copia el agente a `%LOCALAPPDATA%\PCRemote` (puedes borrar la descarga);
+- lo registra para que **arranque cada vez que enciendas Windows**;
+- intenta abrir el puerto en el firewall (si no tiene permisos, Windows preguntará
+  la primera vez: pulsa **Permitir acceso** en redes privadas);
+- deja en el escritorio el acceso directo **Enlace para el celular**;
+- abre una página con un **código QR**: escanéalo con la cámara del celular y ya
+  estás dentro. Agrégalo a la pantalla de inicio y queda como una app.
+
+Para deshacerlo: `python pc-remote.py --desinstalar`. Para que no toque nada del
+arranque: `--no-instalar`.
+
+---
+
+## Si el router le cambia la IP a la PC
+
+Es el punto flojo de cualquier montaje en red local, y conviene entenderlo:
+
+- El acceso directo **Enlace para el celular** del escritorio apunta a
+  `localhost`, así que **siempre muestra la IP actual**. Si el enlace del celular
+  deja de funcionar, ábrelo y vuelve a escanear el QR: 10 segundos.
+- La pega: eso hay que hacerlo **desde la PC**. Si estás fuera de casa cuando
+  cambia la IP, te quedas sin acceso hasta volver.
+
+Arreglos permanentes, de menos a más esfuerzo:
+
+1. **Reserva de IP en el router** (lo más recomendable): entra a su configuración
+   y busca *DHCP reservation* / *IP estática* / *Asignación manual*, y ata la IP a
+   tu PC. Se hace una vez y se acabó el problema. El nombre exacto varía según la
+   marca del router.
+2. **El nombre `.local`**: la página del QR también muestra un enlace tipo
+   `http://TU-PC.local:8765/?t=...` que no depende de la IP. Funciona en muchas
+   redes pero no en todas — en iPhone suele ir bien; en Android es irregular.
+   Pruébalo: si te funciona, usa ese y olvídate.
+3. **Tailscale**: IP fija de por vida y además acceso desde fuera de casa. Ver más
+   abajo.
 
 ---
 
